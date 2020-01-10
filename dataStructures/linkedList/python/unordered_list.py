@@ -5,12 +5,8 @@ class Node(object):
 
 class UnorderedList(object):
     def __init__(self):
-        """
-        Keep track of tail and length for convenience
-        """
         self.head = None
         self.tail = None
-        self.length = 0
 
     def __str__(self):
         if self.head is None:
@@ -29,7 +25,14 @@ class UnorderedList(object):
         return return_string
 
     def __len__(self):
-        return self.length
+        count = 0
+        current = self.head
+
+        while current is not None:
+            count += 1
+            current = current.next
+
+        return count
 
     def add(self, item):
         """
@@ -42,8 +45,6 @@ class UnorderedList(object):
             node = Node(item)
             node.next = self.head
             self.head = node
-
-        self.length += 1
 
     def remove(self, item):
         """
@@ -95,8 +96,6 @@ class UnorderedList(object):
             self.tail.next = node
             self.tail = node
 
-        self.length += 1
-
     def index(item):
         """
         Return first index of item
@@ -118,12 +117,15 @@ class UnorderedList(object):
         """
         Insert at pos, index starting at 0
         """
-        if pos > self.length:
+        if pos > len(self):
             return False
-        elif pos == self.length:
+        elif pos == len(self):
             # If pos is 1 greater than last index,
             # assume user wants to append
             return self.append(item)
+        elif pos == 0:
+            # Just use regular add
+            return self.add(item)
 
         idx = 0
         current = self.head
@@ -142,10 +144,10 @@ class UnorderedList(object):
     def pop(self, pos = None):
         """
         Unfortunately, since our nodes aren't doubly-linked,
-        we still have to traverse, even if we have reference to tail
-        (we can't do `tail = tail.previous`)
+        we still have to traverse to remove last node, even if we have
+        reference to tail (we can't do `tail = tail.previous`)
         """
-        if self.head is None or (pos is not None and pos >= self.length):
+        if self.head is None or (pos is not None and pos >= len(self)):
             # Empty list or pos beyond list length
             return False
         elif self.head.next is None:
@@ -158,7 +160,7 @@ class UnorderedList(object):
             value = self.head.value
             self.head = self.head.next
             return value
-        elif pos is None or pos == self.length - 1:
+        elif pos is None or pos == len(self) - 1:
             # Regular pop(). If pos is last index,
             # assume user wants regular pop()
             previous = None
@@ -182,9 +184,8 @@ class UnorderedList(object):
                 current = current.next
 
             if idx == pos:
-                val = current.value
                 previous.next = current.next
-                return val
+                return current.value
 
 
 if __name__ == "__main__":
@@ -201,4 +202,8 @@ if __name__ == "__main__":
     ll.add(100)
     print(ll)
     ll.pop(0)
+    print(ll)
+    ll.add(200)
+    print(ll)
+    print(ll.pop(1))
     print(ll)
