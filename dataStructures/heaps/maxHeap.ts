@@ -8,24 +8,26 @@
 // leftChild = i * 2
 // rightChild = i * 2 + 1
 
-class MaxHeap {
-  container: Array<number>
+class MaxHeap<T> {
+  container: Array<T>
 
   constructor() {
     this.container = [null]
   }
 
-  swap(idxA: number, idxB: number): void {
-    const temp = this.container[idxA]
+  private swap(idxA: number, idxB: number): void {
+    const temp: T = this.container[idxA]
     this.container[idxA] = this.container[idxB]
     this.container[idxB] = temp
   }
 
   heapSize(): number {
+    // Heap size is always 1 less than length because
+    // first item of container array is null
     return this.container.length - 1
   }
 
-  max(): number {
+  max(): T {
     try {
       return this.container[1]
     } catch (e) {
@@ -33,50 +35,50 @@ class MaxHeap {
     }
   }
 
-  maxHeapify(idx: number): void {
-    let current: number = this.container[idx]
+  bottomUpMaxHeapify(idx: number): void {
+    const parentIdx: number = Math.floor(idx / 2)
+    if (idx > 1 && this.container[idx] > this.container[parentIdx]) {
+      this.swap(idx, parentIdx)
+      this.bottomUpMaxHeapify(parentIdx)
+    }
+  }
+
+  topDownMaxHeapify(idx: number): void {
+    let largestIdx: number = idx
     let leftIdx: number = idx * 2
     let rightIdx: number = idx * 2 + 1
-    let largestIdx: number = idx
-
-    let leftChild: number = null
-    let rightChild: number = null
 
     // Inside of bounds check
-    if (leftIdx <= this.heapSize()) {
-      leftChild = this.container[leftIdx]
-      if (leftChild > current) {
-        largestIdx = leftIdx
-      }
+    if (leftIdx <= this.heapSize() && this.container[leftIdx] > this.container[largestIdx]) {
+      largestIdx = leftIdx
     }
 
     // Inside of bounds check
-    if (rightIdx <= this.heapSize()) {
-      rightChild = this.container[rightIdx]
-
-      if (rightChild > this.container[largestIdx]) {
-        largestIdx = rightIdx
-      }
+    if (rightIdx <= this.heapSize() && this.container[rightIdx] > this.container[largestIdx]) {
+      largestIdx = rightIdx
     }
 
     if (largestIdx !== idx) {
       this.swap(idx, largestIdx)
-      this.maxHeapify(largestIdx)
+      this.topDownMaxHeapify(largestIdx)
     }
   }
 
-  insert(val: number): void {
+  insert(val: T): void {
     // Push to end of container, then swim up
     // until it's in the correct place
     this.container.push(val)
     let n = this.heapSize()
-
-    while (n > 0) {
-      this.maxHeapify(n)
-      n = Math.floor(n / 2)
-    }
+    this.bottomUpMaxHeapify(n)
   }
 
-
-
+  serialize(): string {
+    return this.container.slice(1).join("-")
+  }
 }
+
+const mh = new MaxHeap()
+mh.insert(4)
+mh.insert(3)
+mh.insert(8)
+console.log(mh.serialize())
