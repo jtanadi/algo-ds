@@ -8,7 +8,7 @@
 // leftChild = i * 2
 // rightChild = i * 2 + 1
 
-class MaxHeap<T> {
+export default class MaxHeap<T> {
   container: Array<T>
 
   constructor() {
@@ -32,6 +32,24 @@ class MaxHeap<T> {
       return this.container[1]
     } catch (e) {
       throw new Error("Nothing in this heap yet")
+    }
+  }
+
+  extractMax(): T {
+    this.swap(1, this.heapSize())
+    const retVal: T = this.container.pop()
+
+    if (this.heapSize()) {
+      this.topDownMaxHeapify(1)
+    }
+    return retVal
+  }
+
+
+  buildMaxHeap(arr: Array<T>): void {
+    this.container = [...this.container, ...arr]
+    for (let i = Math.floor(this.heapSize() / 2); i >= 1; i--) {
+      this.topDownMaxHeapify(i)
     }
   }
 
@@ -77,8 +95,8 @@ class MaxHeap<T> {
   }
 }
 
-const mh = new MaxHeap()
-mh.insert(4)
-mh.insert(3)
-mh.insert(8)
-console.log(mh.serialize())
+/* const mh = new MaxHeap() */
+/* mh.insert(4) */
+/* mh.insert(3) */
+/* mh.insert(8) */
+/* console.log(mh.serialize()) */
