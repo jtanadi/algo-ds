@@ -33,6 +33,8 @@ class MaxHeap(object):
         Insert new value by adding to end of heap
         then swimming value into place as necessary
 
+        Time complexity: O(log n)
+
         >>> L4 = [4, 2, 1]
         >>> heap4 = MaxHeap()
         >>> heap4.build_max_heap(L4)
@@ -49,21 +51,21 @@ class MaxHeap(object):
         """
         self.heap_array.append(value)
         n = self.heap_size()
-
-        for i in reversed(range(1, n // 2 + 1)):
-            self.max_heapify(i)
+        self.bottom_up_max_heapify(n)
 
     def extract_max(self):
         """
         Extract max value by swapping with last element
         and then "swimming" next largest item to top
+
+        Time complexity: O(log n)
         """
         self._swap(1, self.heap_size())
         ret_val = self.heap_array.pop()
 
         # In case the array is empty after pop()
         if self.heap_size() >=1 :
-            self.max_heapify(1)
+            self.top_down_max_heapify(1)
 
         return ret_val
 
@@ -71,6 +73,8 @@ class MaxHeap(object):
         """
         Max heap sort by building a max heap
         and calling extract_max() until heap is empty
+
+        Time complexity: O(n log n)
         """
         self.build_max_heap(input_array)
 
@@ -83,6 +87,10 @@ class MaxHeap(object):
     def build_max_heap(self, input_array):
         """
         Builds a max heap out of an unordered array
+
+        Time complexity (simple analysis): O(n log n)
+        Time complexity (tighter analysis): O(n)
+
         >>> L1 = [4, 3, 1, 6, 5, 2]
         >>> heap1 = MaxHeap()
         >>> heap1.build_max_heap(L1)
@@ -109,29 +117,41 @@ class MaxHeap(object):
         # if n = 6, n // 2 + 1 = 4
         # range(1, 4) = 1, 2, 3; reversed = 3, 2, 1
         for i in reversed(range(1, n // 2 + 1)):
-            self.max_heapify(i)
+            self.top_down_max_heapify(i)
 
-    def max_heapify(self, i):
+    def bottom_up_max_heapify(self, i):
         """
-        Creates a max heap at a specific node
-        by "swimming" larger node
+        Bottom-up approach of creating a max heap
+        starting at node `i`, up to root
+
+        Time complexity: O(log n)
         """
-        current = self.heap_array[i]
+        if i > 1:
+            parentIdx = i // 2
+            if self.heap_array[i] > self.heap_array[parentIdx]:
+                self._swap(i, parentIdx)
+
+            self.bottom_up_max_heapify(parentIdx)
+
+    def top_down_max_heapify(self, i):
+        """
+        Top-down approach of creating a max heap
+        starting at node `i`, down to leaf
+
+        Time complexity: O(log n)
+        """
+        largest_idx = i
         left_idx = i * 2
         right_idx = i * 2 + 1
-        left_child = right_child = None
-        largest_idx = i
 
         # make sure not out of bounds
-        if left_idx <= self.heap_size():
-            left_child = self.heap_array[left_idx]
-            if left_child > current:
+        if left_idx <= self.heap_size() and\
+            self.heap_array[left_idx] > self.heap_array[largest_idx]:
                 largest_idx = left_idx
 
         # make sure not out of bounds
-        if right_idx <= self.heap_size():
-            right_child = self.heap_array[right_idx]
-            if right_child > self.heap_array[largest_idx]:
+        if right_idx <= self.heap_size() and\
+            self.heap_array[right_idx] > self.heap_array[largest_idx]:
                 largest_idx = right_idx
 
         if largest_idx != i:
@@ -140,7 +160,7 @@ class MaxHeap(object):
             # recurse to swapped child to make sure
             # max heap property isn't violated down the line
             # (largest_idx is no longer the largest post-swap)
-            self.max_heapify(largest_idx)
+            self.top_down_max_heapify(largest_idx)
 
 
 if __name__ == "__main__":
