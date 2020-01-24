@@ -1,4 +1,12 @@
 def counting_sort(L):
+    """
+    Works only for positive integer keys
+    0 to k-1
+    
+    Time complexity: O(n + k)
+    n is length of L
+    k is number of keys (ie. length of `pos`)
+    """
     n = len(L)
 
     pos = [0] * n
@@ -11,8 +19,7 @@ def counting_sort(L):
         num_count = pos[i]
 
     sorted_L = [None] * n
-    for i in range(n):
-        item = L[i]
+    for item in L:
         new_idx = pos[item]
         sorted_L[new_idx] = item
         pos[item] += 1
