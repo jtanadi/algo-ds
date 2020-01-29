@@ -233,37 +233,46 @@ class BST(object):
             found = None
 
         # Case 3: node has both children
-        # So we find next larger (or next smaller) node,
-        # which is guaranteed to be a leaf somewhere below current node,
-        # we store its (key, value), delete the node recursively
-        # (because easiest to delete leaf node)
-        # and set the current node's (key, value) to the stored (key, value)
+        # Find node's next larger, use its key and value,
+        # delete next larger, and set current node's
+        # key and value to the stored key and value
+
+        # delete(8), use next larger (9),
+        # but next larger has 1 child (which may have children)
         #      8
         #    /   \
-        #   6     10
+        #   6     12
         #  / \    / \
-        # 4   7  9  11
+        # 4   7  9   11
+        #         \
+        #          10
 
-        # use next smaller
-        #      7
-        #    /   \
-        #   6     10
-        #  / \    / \
-        # 4   N  9  11
-
-        # use next larger
         #      9
         #    /   \
-        #   6     10
+        #   6     12
         #  / \    / \
-        # 4   7  N  11
+        # 4   7  10  11
+
         else:
+            # Find next larger (or next smaller) node,
+            # which is guaranteed to only have at most one child
+            # (that child could still have children).
             next_larger = self.find_next_larger(found)
 
+            # In case next_larger has a child
+            # In this case, next_larger's child will
+            # always be a right child and next_larger
+            # will always be its parent's left child
+            if next_larger.right:
+                next_larger.parent.left = next_larger.right
+
+            # Store next_larger's key and value
+            # and delete next_larger
             next_larger_key = next_larger.key
             next_larger_value = next_larger.value
-
             self.delete(next_larger)
+
+            # Use stored key and value in place of current node's
             found.key = next_larger_key
             found.value = next_larger_value
 
