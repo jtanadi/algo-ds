@@ -187,6 +187,12 @@ class BST(object):
             return parent
 
     def delete(self, input_node):
+        """
+        Delete a node. Accepts a node or a key
+        used to find a node.
+
+        The deleted node is returned.
+        """
         # Simple check to make sure
         # input_node exists in this tree
         found = self.find(input_node)
@@ -203,6 +209,8 @@ class BST(object):
             else:
                 parent.left = None
 
+            return found
+
         # Case 2A: node has one child (right child)
         # Set current node's parent to current node's child
         elif found.left is None:
@@ -215,11 +223,7 @@ class BST(object):
             # Make sure to set child's parent reference
             # to its new parent (current's parent)
             found.right.parent = parent
-
-            # Not entirely necessary in py because
-            # a dereferenced node will be garbage collected
-            # but this is more explicit
-            found = None
+            return found
 
         # Case 2B: node has one child (left child)
         # Set current node's parent to current node's child
@@ -230,7 +234,7 @@ class BST(object):
             else:
                 parent.right = found.left
             found.left.parent = parent
-            found = None
+            return found
 
         # Case 3: node has both children
         # Find node's next larger, use its key and value,
@@ -259,22 +263,21 @@ class BST(object):
             # (that child could still have children).
             next_larger = self.find_next_larger(found)
 
-            # In case next_larger has a child
-            # In this case, next_larger's child will
-            # always be a right child and next_larger
-            # will always be its parent's left child
-            if next_larger.right:
-                next_larger.parent.left = next_larger.right
-
             # Store next_larger's key and value
             # and delete next_larger
             next_larger_key = next_larger.key
             next_larger_value = next_larger.value
+
+            # Recursively delete next_larger
+            # next_larger might have 1 child, like case #2
             self.delete(next_larger)
 
             # Use stored key and value in place of current node's
             found.key = next_larger_key
             found.value = next_larger_value
+
+            return next_larger
+
 
     def __str__(self):
         """
